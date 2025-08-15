@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "Autenticar";
+}
+@section Styles {
+    <link href="~/Content/Login.css" rel="stylesheet" />
+}
+
+<div class="login-container">
+    <div class="glass-box">
+        <form action="/login" method="POST">
+            <h2 class="text-center">Iniciar Sesión</h2>
+
+            <label for="user">Usuario:</label>
+            <input type="text" id="user" name="user" placeholder="correo" required>
+
+            <label for="password">Clave:</label>
+            <input type="password" id="password" name="password" placeholder="contraseña" required>
+
+            <button type="submit">Ingresar</button>
+            @Html.ActionLink("Registrarse", "Registrarse", "Login")
+
+        </form>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "Registrarse";
+}
+@section Styles {
+    <link href="~/Content/Login.css" rel="stylesheet" />
+}
+
+<form action="/registro" method="POST">
+    <h2>Registrarse</h2>
+
+    <div class="form-grid">
+        <div>
+            <label for="identificacion">Identificación:</label>
+            <input type="text" id="identificacion" name="identificacion" placeholder="Número de cedula" required>
+        </div>
+
+        <div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+        </div>
+
+        <div>
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" required>
+        </div>
+
+        <div>
+            <label for="correo">Correo electrónico:</label>
+            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.com" required>
+        </div>
+
+        <div>
+            <label for="fechaNacimiento">Fecha de nacimiento:</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+        </div>
+
+        <div>
+            <label for="idUsuario">ID de usuario:</label>
+            <input type="text" id="idUsuario" name="idUsuario" placeholder="Ingresa el ID de usuario" required>
+        </div>
+
+        <div>
+            <label for="usuario">Usuario:</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Ingresa el nombre de usuario" required>
+        </div>
+
+        <div>
+            <label for="contrasena">Contraseña:</label>
+            <input type="password" id="contrasena" name="contrasena" placeholder="Crea una contraseña" required>
+        </div>
+
+        <div>
+            <label for="fechaContratacion">Fecha de contratación:</label>
+            <input type="date" id="fechaContratacion" name="fechaContratacion" required>
+        </div>
+
+
+        <div>
+            <label for="genero">Género:</label>
+            <select id="genero" name="genero" class="select-genero" required>
+                <option value="">Selecciona una opción</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="submit">Registrarse</button>
+    @Html.ActionLink("Iniciar Sesion", "Autenticar", "Login")
+</form>
+
+
+
+
