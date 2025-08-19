@@ -1,0 +1,86 @@
+﻿/* Título principal */
+h2 {
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Contenedor de tarjetas */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+/* Cada columna */
+.col-md-4 {
+    flex: 0 0 300px;
+    max-width: 300px;
+}
+
+/* Tarjetas con efecto vidrio */
+.card {
+    background: rgba(255, 255, 255, 0.2); /* translúcido */
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: #000;
+}
+
+    /* Animación al pasar el mouse */
+    .card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+/* Contenido de la tarjeta */
+.card-body {
+    text-align: center;
+    padding: 20px;
+}
+
+/* Título y texto */
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #000;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+/* Botón translúcido */
+.btn {
+    margin-top: 10px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #000;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+    .btn:hover {
+        background-color: rgba(255, 255, 255, 0.7);
+        color: #000;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+}

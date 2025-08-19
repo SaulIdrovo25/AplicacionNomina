@@ -1,11 +1,102 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Inicio";
-}
-@{
     Layout = "~/Views/Shared/_LayoutMenu.cshtml";
 }
+@section Styles {
+    <link rel="stylesheet" href="~/Content/InicioPanelControl.css" />
+}
 
 
-<h2>Inicio</h2>
+<h2 class="mb-4">Panel de Control del Sistema</h2>
 
+<div class="row">
+
+    <!-- Gestión de Empleados -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestión de Empleados</h5>
+                <p class="card-text">Crear, editar y consultar empleados.</p>
+                @Html.ActionLink("Ingresar", "Index", "Empleados", null, new { @class = "btn btn-primary" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de Departamentos -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestión de Departamentos</h5>
+                <p class="card-text">Administrar departamentos y áreas.</p>
+                @Html.ActionLink("Ingresar", "Index", "Departamentos", null, new { @class = "btn btn-success" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Asignación de Empleados -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Asignación de Empleados</h5>
+                <p class="card-text">Asignar empleados a departamentos.</p>
+                @Html.ActionLink("Ingresar", "Index", "DeptEmp", null, new { @class = "btn btn-warning" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de Títulos -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-info h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestión de Títulos</h5>
+                <p class="card-text">Registrar títulos académicos o profesionales.</p>
+                @Html.ActionLink("Ingresar", "Index", "Titles", null, new { @class = "btn btn-info" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de Salarios -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-danger h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestión de Salarios</h5>
+                <p class="card-text">Registrar y consultar historial salarial.</p>
+                @Html.ActionLink("Ingresar", "Index", "Salaries", null, new { @class = "btn btn-danger" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Gestión de Contratos -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-secondary h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Gestión de Contratos</h5>
+                <p class="card-text">Controlar fechas de ingreso y tipo de contrato.</p>
+                @Html.ActionLink("Ingresar", "Index", "Contratos", null, new { @class = "btn btn-secondary" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluaciones de Desempeño -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-light h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Evaluaciones de Desempeño</h5>
+                <p class="card-text">Registrar metas y resultados por empleado.</p>
+                @Html.ActionLink("Ingresar", "Index", "Evaluaciones", null, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes y Estadísticas -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Reportes y Estadísticas</h5>
+                <p class="card-text">Generar informes de nómina y estructura.</p>
+                @Html.ActionLink("Ingresar", "Index", "Reportes", null, new { @class = "btn btn-outline-primary" })
+            </div>
+        </div>
+    </div>
+
+</div>
