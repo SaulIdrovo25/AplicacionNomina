@@ -1,26 +1,40 @@
-﻿
+﻿@model AplicacionNomina.Models.LoginViewModel
+
 @{
     ViewBag.Title = "Autenticar";
 }
+
 @section Styles {
     <link href="~/Content/Login.css" rel="stylesheet" />
 }
 
 <div class="login-container">
     <div class="glass-box">
-        <form action="/login" method="POST">
+        @using (Html.BeginForm("Autenticar", "Login", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
             <h2 class="text-center">Iniciar Sesión</h2>
 
-            <label for="user">Usuario:</label>
-            <input type="text" id="user" name="user" placeholder="correo" required>
+            <div>
+                @Html.LabelFor(m => m.Usuario)
+                @Html.TextBoxFor(m => m.Usuario, new { placeholder = "Usuario", required = "required" })
+                @Html.ValidationMessageFor(m => m.Usuario)
+            </div>
 
-            <label for="password">Clave:</label>
-            <input type="password" id="password" name="password" placeholder="contraseña" required>
+            <div>
+                @Html.LabelFor(m => m.Clave)
+                @Html.PasswordFor(m => m.Clave, new { placeholder = "Contraseña", required = "required" })
+                @Html.ValidationMessageFor(m => m.Clave)
+            </div>
 
             <button type="submit">Ingresar</button>
+
             @Html.ActionLink("Registrarse", "Registrarse", "Login")
 
-        </form>
+            @Html.ValidationSummary(true, "", new { @class = "error-message" })
+
+        }
     </div>
 </div>
 
