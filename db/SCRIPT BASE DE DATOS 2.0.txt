@@ -1,0 +1,270 @@
+-- =====================================
+-- BASE DE DATOS ACTUALIZADA
+-- =====================================
+
+CREATE DATABASE EmpleadosReutilizacion;
+GO
+
+USE EmpleadosReutilizacion;
+GO
+
+-- =====================================
+-- TABLAS PRINCIPALES
+-- =====================================
+
+-- Tabla: Departments
+CREATE TABLE departments (
+    dept_no INT IDENTITY(1,1) PRIMARY KEY,
+    dept_name VARCHAR(50) NOT NULL,
+    is_active BIT NOT NULL DEFAULT 1
+);
+
+-- Tabla: Employees
+CREATE TABLE employees (
+    emp_no INT IDENTITY(1,1) PRIMARY KEY,
+    ci VARCHAR(50) NOT NULL UNIQUE,
+    birth_date DATE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    gender CHAR(1) NOT NULL CHECK (gender IN ('M','F')),
+    hire_date DATE NOT NULL,
+    correo VARCHAR(100) NOT NULL UNIQUE,
+    is_active BIT NOT NULL DEFAULT 1
+);
+
+-- Tabla: Users
+CREATE TABLE users (
+    emp_no INT NOT NULL PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL UNIQUE,
+    clave_hash VARBINARY(256) NOT NULL, -- clave en HASH, no texto plano
+    rol VARCHAR(20) NOT NULL DEFAULT 'RRHH' -- admin / rrhh
+);
+
+-- Tabla: Salaries
+CREATE TABLE salaries (
+    emp_no INT NOT NULL,
+    salary DECIMAL(18,2) NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NULL,
+    PRIMARY KEY (emp_no, from_date)
+);
+
+-- Tabla: Titles
+CREATE TABLE titles (
+    emp_no INT NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NULL,
+    PRIMARY KEY (emp_no, title, from_date)
+);
+
+-- Tabla: Dept_Emp
+CREATE TABLE dept_emp (
+    emp_no INT NOT NULL,
+    dept_no INT NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    PRIMARY KEY (emp_no, dept_no),
+    CONSTRAINT CK_dept_emp_dates CHECK (from_date <= to_date)
+);
+
+-- Tabla: Dept_Manager
+CREATE TABLE dept_manager (
+    emp_no INT NOT NULL,
+    dept_no INT NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    PRIMARY KEY (emp_no, dept_no),
+    CONSTRAINT CK_dept_manager_dates CHECK (from_date <= to_date)
+);
+
+-- Tabla: Log_AuditoriaSalarios
+CREATE TABLE Log_AuditoriaSalarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL,
+    fechaActualizacion DATETIME NOT NULL DEFAULT GETDATE(),
+    DetalleCambio VARCHAR(250) NOT NULL,
+    salario DECIMAL(18,2) NOT NULL,
+    emp_no INT NOT NULL
+);
+
+-- =====================================
+-- CLAVES FORÁNEAS
+-- =====================================
+
+-- users → employees
+ALTER TABLE users
+ADD CONSTRAINT FK_users_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- salaries → employees
+ALTER TABLE salaries
+ADD CONSTRAINT FK_salaries_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- titles → employees
+ALTER TABLE titles
+ADD CONSTRAINT FK_titles_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_emp → employees
+ALTER TABLE dept_emp
+ADD CONSTRAINT FK_dept_emp_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_emp → departments
+ALTER TABLE dept_emp
+ADD CONSTRAINT FK_dept_emp_departments
+FOREIGN KEY (dept_no) REFERENCES departments(dept_no);
+
+-- dept_manager → employees
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_dept_manager_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_manager → departments
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_dept_manager_departments
+FOREIGN KEY (dept_no) REFERENCES departments(dept_no);
+
+-- Log_AuditoriaSalarios → employees
+ALTER TABLE Log_AuditoriaSalarios
+ADD CONSTRAINT FK_LogAuditoriaSalarios_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- =====================================
+-- TRIGGER DE AUDITORÍA
+-- =====================================
+
+CREATE TRIGGER trg_AuditoriaSalarios
+ON salaries
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    INSERT INTO Log_AuditoriaSalarios(usuario, fechaActualizacion, DetalleCambio, salario, emp_no)
+    SELECT SYSTEM_USER, GETDATE(), 'Alta o actualización de salario', salary, emp_no
+    FROM inserted;
+END;
+GO
+
+-- =====================================
+-- PROCEDIMIENTO DE AUTENTICACIÓN
+-- (autenticación básica, comparar hash en C#)
+-- =====================================
+
+CREATE PROCEDURE AutenticarUsuario
+    @usuario VARCHAR(100),
+    @claveHash VARBINARY(256)  -- clave ya hasheada desde C#
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM users WHERE usuario = @usuario AND clave_hash = @claveHash)
+    BEGIN
+        SELECT
+            'Autenticación exitosa. Datos del empleado:' AS Mensaje,
+            u.usuario,
+            e.first_name + ' ' + e.last_name AS NombreCompleto,
+            e.correo,
+            u.rol
+        FROM users u
+        INNER JOIN employees e ON u.emp_no = e.emp_no
+        WHERE u.usuario = @usuario AND u.clave_hash = @claveHash;
+    END
+    ELSE
+    BEGIN
+        SELECT 'Usuario o clave incorrectos' AS Mensaje;
+    END
+END;
+GO
+
+
+GO
+
+-- =====================================
+-- DEPARTAMENTOS
+-- =====================================
+
+
+INSERT INTO departments (dept_name) VALUES
+('Recursos Humanos'),
+('Finanzas'),
+('Tecnología'),
+('Marketing'),
+('Logística');
+
+-- =====================================
+-- EMPLEADOS
+-- =====================================
+
+INSERT INTO employees (ci, birth_date, first_name, last_name, gender, hire_date, correo) VALUES
+('0102345678', '1988-04-12', 'Sofía', 'Morales', 'F', '2015-02-10', 'sofia.morales@empresa.com'),
+('0203456789', '1979-09-20', 'Andrés', 'Castillo', 'M', '2010-06-15', 'andres.castillo@empresa.com'),
+('0304567890', '1992-11-08', 'Paola', 'Vásquez', 'F', '2018-09-01', 'paola.vasquez@empresa.com'),
+('0405678901', '1995-02-14', 'Jorge', 'Ríos', 'M', '2021-05-20', 'jorge.rios@empresa.com'),
+('0506789012', '1985-12-25', 'Valentina', 'Herrera', 'F', '2012-03-05', 'valentina.herrera@empresa.com');
+
+-- =====================================
+-- USUARIOS (hash ficticio para ejemplo)
+-- En C# deberás generar hash real con BCrypt.Net
+-- =====================================
+
+INSERT INTO users (emp_no, usuario, clave_hash, rol) VALUES
+(1, 'smorales', 0x1234, 'rrhh'),      -- Sofía es de RRHH
+(2, 'acastillo', 0x2345, 'admin'),    -- Andrés es gerente de Finanzas
+(3, 'pvasquez', 0x3456, 'rrhh'),      -- Paola es desarrolladora
+(4, 'jrios',     0x4567, 'rrhh'),      -- Jorge es diseñador en Marketing
+(5, 'vherrera',  0x5678, 'admin');    -- Valentina es gerente de Logística
+
+-- =====================================
+-- SALARIOS
+-- =====================================
+
+INSERT INTO salaries (emp_no, salary, from_date, to_date) VALUES
+(1, 1200.00, '2015-02-10', NULL),   -- Sofía (Analista RRHH)
+(2, 3500.00, '2010-06-15', NULL),   -- Andrés (Gerente Finanzas)
+(3, 2000.00, '2018-09-01', NULL),   -- Paola (Desarrolladora TI)
+(4, 1500.00, '2021-05-20', NULL),   -- Jorge (Diseñador Marketing)
+(5, 3000.00, '2012-03-05', NULL);   -- Valentina (Gerente Logística)
+
+-- =====================================
+-- TITULOS
+-- =====================================
+
+INSERT INTO titles (emp_no, title, from_date, to_date) VALUES
+(1, 'Analista de RRHH', '2015-02-10', NULL),
+(2, 'Gerente de Finanzas', '2010-06-15', NULL),
+(3, 'Desarrolladora de Software', '2018-09-01', NULL),
+(4, 'Diseñador Gráfico', '2021-05-20', NULL),
+(5, 'Gerente de Logística', '2012-03-05', NULL);
+
+-- =====================================
+-- ASIGNACIONES A DEPARTAMENTOS
+-- =====================================
+
+INSERT INTO dept_emp (emp_no, dept_no, from_date, to_date) VALUES
+(1, 1, '2015-02-10', '9999-12-31'), -- Sofía en RRHH
+(2, 2, '2010-06-15', '9999-12-31'), -- Andrés en Finanzas
+(3, 3, '2018-09-01', '9999-12-31'), -- Paola en Tecnología
+(4, 4, '2021-05-20', '9999-12-31'), -- Jorge en Marketing
+(5, 5, '2012-03-05', '9999-12-31'); -- Valentina en Logística
+
+-- =====================================
+-- GERENTES DE DEPARTAMENTOS
+-- =====================================
+
+INSERT INTO dept_manager (emp_no, dept_no, from_date, to_date) VALUES
+(1, 1, '2020-01-01', '9999-12-31'), -- Sofía como responsable temporal de RRHH
+(2, 2, '2010-06-15', '9999-12-31'), -- Andrés gerente de Finanzas
+(3, 3, '2022-01-01', '9999-12-31'), -- Paola encargada técnica
+(4, 4, '2023-01-01', '9999-12-31'), -- Jorge coordinador de Marketing
+(5, 5, '2012-03-05', '9999-12-31'); -- Valentina gerente de Logística
+
+-- =====================================
+-- LOG DE AUDITORÍA (iniciales)
+-- =====================================
+
+INSERT INTO Log_AuditoriaSalarios (usuario, DetalleCambio, salario, emp_no) VALUES
+('admin', 'Alta salario inicial', 1200.00, 1),
+('admin', 'Alta salario inicial', 3500.00, 2),
+('rrhh',  'Alta salario inicial', 2000.00, 3),
+('rrhh',  'Alta salario inicial', 1500.00, 4),
+('admin', 'Alta salario inicial', 3000.00, 5);

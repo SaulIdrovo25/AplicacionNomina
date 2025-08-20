@@ -8,38 +8,39 @@ namespace AplicacionNomina.Models
 {
     public class RegistroViewModel
     {
-        [Required]
-        public string Ci { get; set; }
+        [Required(ErrorMessage = "La cédula es obligatoria.")]
+        public string Cedula { get; set; }
 
-        [Required]
-        public string FirstName { get; set; }
+        [Required(ErrorMessage = "Los nombres son obligatorios.")]
+        public string Nombres { get; set; }
 
-        [Required]
-        public string LastName { get; set; }
+        [Required(ErrorMessage = "Los apellidos son obligatorios.")]
+        public string Apellidos { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
         [DataType(DataType.Date)]
-        public DateTime BirthDate { get; set; }
+        public DateTime FechaNacimiento { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La fecha de contratación es obligatoria.")]
         [DataType(DataType.Date)]
-        public DateTime HireDate { get; set; }
+        public DateTime FechaContratacion { get; set; }
 
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "Ingresa un correo electrónico válido.")]
         public string Correo { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
         public string Usuario { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [DataType(DataType.Password)]
         public string Clave { get; set; }
 
-        [Required]
-        public string Gender { get; set; }
+        [Required(ErrorMessage = "El género es obligatorio.")]
+        public string Genero { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El rol es obligatorio.")]
         public string Rol { get; set; }
     }
 }
+

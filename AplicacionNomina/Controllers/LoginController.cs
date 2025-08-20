@@ -103,12 +103,12 @@ namespace AplicacionNomina.Controllers
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmd.Parameters.AddWithValue("@Ci", model.Ci);
-                        cmd.Parameters.AddWithValue("@BirthDate", model.BirthDate);
-                        cmd.Parameters.AddWithValue("@FirstName", model.FirstName);
-                        cmd.Parameters.AddWithValue("@LastName", model.LastName);
-                        cmd.Parameters.AddWithValue("@Gender", model.Gender);
-                        cmd.Parameters.AddWithValue("@HireDate", model.HireDate);
+                        cmd.Parameters.AddWithValue("@Ci", model.Cedula);
+                        cmd.Parameters.AddWithValue("@BirthDate", model.FechaNacimiento);
+                        cmd.Parameters.AddWithValue("@FirstName", model.Nombres);
+                        cmd.Parameters.AddWithValue("@LastName", model.Apellidos);
+                        cmd.Parameters.AddWithValue("@Gender", model.Genero);
+                        cmd.Parameters.AddWithValue("@HireDate", model.FechaContratacion);
                         cmd.Parameters.AddWithValue("@Correo", model.Correo);
                         cmd.Parameters.AddWithValue("@Usuario", model.Usuario);
                         cmd.Parameters.AddWithValue("@Rol", model.Rol);
