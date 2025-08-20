@@ -157,24 +157,85 @@ CREATE PROCEDURE AutenticarUsuario
     @claveHash VARBINARY(256)  -- clave ya hasheada desde C#
 AS
 BEGIN
-    IF EXISTS (SELECT 1 FROM users WHERE usuario = @usuario AND clave_hash = @claveHash)
+    IF EXISTS (
+        SELECT 1
+        FROM users
+        WHERE usuario = @usuario AND clave_hash = @claveHash
+    )
     BEGIN
         SELECT
-            'Autenticación exitosa. Datos del empleado:' AS Mensaje,
-            u.usuario,
-            e.first_name + ' ' + e.last_name AS NombreCompleto,
-            e.correo,
-            u.rol
-        FROM users u
-        INNER JOIN employees e ON u.emp_no = e.emp_no
-        WHERE u.usuario = @usuario AND u.clave_hash = @claveHash;
+            1 AS Autenticado,
+            'Autenticación exitosa' AS Mensaje;
     END
     ELSE
     BEGIN
-        SELECT 'Usuario o clave incorrectos' AS Mensaje;
-    END
+        SELECT
+            0 AS Autenticado,
+            'Usuario o clave incorrectos' AS Mensaje;
+    END
 END;
 GO
+
+-- =====================================
+-- procedimiento para registar empeleado y usuario
+-- =====================================
+CREATE PROCEDURE sp_RegistrarEmpleadoCompleto
+    @Ci VARCHAR(50),
+    @BirthDate DATE,
+    @FirstName VARCHAR(50),
+    @LastName VARCHAR(50),
+    @Gender CHAR(1),
+    @HireDate DATE,
+    @Correo VARCHAR(100),
+    @Usuario VARCHAR(100),
+    @ClaveHash VARBINARY(256),
+    @Rol VARCHAR(20) = 'RRHH' -- valor por defecto
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Insertar en employees
+        INSERT INTO employees (
+            ci, birth_date, first_name, last_name, gender,
+            hire_date, correo
+        )
+        VALUES (
+            @Ci, @BirthDate, @FirstName, @LastName, @Gender,
+            @HireDate, @Correo
+        );
+
+        -- Obtener el emp_no recién generado
+        DECLARE @EmpNo INT;
+        SET @EmpNo = SCOPE_IDENTITY();
+
+        -- Insertar en users
+        INSERT INTO users (
+            emp_no, usuario, clave_hash, rol
+        )
+        VALUES (
+            @EmpNo, @Usuario, @ClaveHash, @Rol
+        );
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+
+        DECLARE @ErrMsg NVARCHAR(4000);
+        DECLARE @ErrSeverity INT;
+        DECLARE @ErrState INT;
+
+        SELECT 
+            @ErrMsg = ERROR_MESSAGE(),
+            @ErrSeverity = ERROR_SEVERITY(),
+            @ErrState = ERROR_STATE();
+
+        RAISERROR (@ErrMsg, @ErrSeverity, @ErrState);
+    END CATCH
+END;
 
 
 GO
