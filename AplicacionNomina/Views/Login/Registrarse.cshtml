@@ -12,33 +12,33 @@
 
     <div class="form-grid">
         <div>
-            @Html.LabelFor(m => m.Ci)
-            @Html.TextBoxFor(m => m.Ci)
-            @Html.ValidationMessageFor(m => m.Ci)
+            @Html.LabelFor(m => m.Cedula)
+            @Html.TextBoxFor(m => m.Cedula)
+            @Html.ValidationMessageFor(m => m.Cedula)
         </div>
 
         <div>
-            @Html.LabelFor(m => m.FirstName)
-            @Html.TextBoxFor(m => m.FirstName)
-            @Html.ValidationMessageFor(m => m.FirstName)
+            @Html.LabelFor(m => m.Nombres)
+            @Html.TextBoxFor(m => m.Nombres)
+            @Html.ValidationMessageFor(m => m.Nombres)
         </div>
 
         <div>
-            @Html.LabelFor(m => m.LastName)
-            @Html.TextBoxFor(m => m.LastName)
-            @Html.ValidationMessageFor(m => m.LastName)
+            @Html.LabelFor(m => m.Apellidos)
+            @Html.TextBoxFor(m => m.Apellidos)
+            @Html.ValidationMessageFor(m => m.Apellidos)
         </div>
 
         <div>
-            @Html.LabelFor(m => m.BirthDate)
-            @Html.TextBoxFor(m => m.BirthDate, "{0:yyyy-MM-dd}", new { type = "date" })
-            @Html.ValidationMessageFor(m => m.BirthDate)
+            @Html.LabelFor(m => m.FechaNacimiento)
+            @Html.TextBoxFor(m => m.FechaNacimiento, "{0:yyyy-MM-dd}", new { type = "date" })
+            @Html.ValidationMessageFor(m => m.FechaNacimiento)
         </div>
 
         <div>
-            @Html.LabelFor(m => m.HireDate)
-            @Html.TextBoxFor(m => m.HireDate, "{0:yyyy-MM-dd}", new { type = "date" })
-            @Html.ValidationMessageFor(m => m.HireDate)
+            @Html.LabelFor(m => m.FechaContratacion)
+            @Html.TextBoxFor(m => m.FechaContratacion, "{0:yyyy-MM-dd}", new { type = "date" })
+            @Html.ValidationMessageFor(m => m.FechaContratacion)
         </div>
 
         <div>
@@ -60,12 +60,12 @@
         </div>
 
         <div>
-            @Html.LabelFor(m => m.Gender)
-            @Html.DropDownListFor(m => m.Gender, new SelectList(new[] {
+            @Html.LabelFor(m => m.Genero)
+            @Html.DropDownListFor(m => m.Genero, new SelectList(new[] {
                 new { Value = "M", Text = "Masculino" },
                 new { Value = "F", Text = "Femenino" }
-            }, "Value", "Text"), "Selecciona una opción")
-            @Html.ValidationMessageFor(m => m.Gender)
+            }, "Value", "Text"), "Selecciona una opción", new { @class = "select-genero" })
+            @Html.ValidationMessageFor(m => m.Genero)
         </div>
 
         <div>
@@ -73,9 +73,10 @@
             @Html.DropDownListFor(m => m.Rol, new SelectList(new[] {
                 new { Value = "RRHH", Text = "RRHH" },
                 new { Value = "admin", Text = "Administrador" }
-            }, "Value", "Text"), "Selecciona un rol")
+            }, "Value", "Text"), "Selecciona un rol", new { @class = "select-genero" })
             @Html.ValidationMessageFor(m => m.Rol)
         </div>
+
     </div>
 
     <button type="submit">Registrarse</button>
@@ -86,8 +87,8 @@
             @ViewBag.Error
         </div>
     }
-
 }
+
 
 
 
