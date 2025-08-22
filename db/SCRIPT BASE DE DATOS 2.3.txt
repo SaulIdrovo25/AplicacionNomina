@@ -179,6 +179,94 @@ GO
 
 GO
 
+
+--listar empelados activos
+CREATE PROCEDURE sp_ListarEmpleadosActivos
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE is_active = 1
+END
+
+--listar empelados inactivos
+CREATE PROCEDURE sp_ListarEmpleadosInactivos
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE is_active = 0
+END
+
+--Crear empleado (solo de la tabla empleado)
+CREATE PROCEDURE sp_CrearEmpleado
+    @ci VARCHAR(50),
+    @birth_date DATE,
+    @first_name VARCHAR(50),
+    @last_name VARCHAR(50),
+    @gender CHAR(1),
+    @hire_date DATE,
+    @correo VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO employees (ci, birth_date, first_name, last_name, gender, hire_date, correo)
+    VALUES (@ci, @birth_date, @first_name, @last_name, @gender, @hire_date, @correo)
+END
+
+--modificar empleado
+CREATE PROCEDURE sp_ModificarEmpleado
+    @id INT,
+    @ci VARCHAR(50),
+    @birth_date DATE,
+    @first_name VARCHAR(50),
+    @last_name VARCHAR(50),
+    @gender CHAR(1),
+    @hire_date DATE,
+    @correo VARCHAR(100)
+AS
+BEGIN
+    UPDATE employees
+    SET ci = @ci,
+        birth_date = @birth_date,
+        first_name = @first_name,
+        last_name = @last_name,
+        gender = @gender,
+        hire_date = @hire_date,
+        correo = @correo
+    WHERE employees.emp_no = @id
+END
+
+--obtener empleado por medio del ID (emp_no)
+CREATE PROCEDURE sp_ObtenerEmpleadoPorId
+    @emp_no INT
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE emp_no = @emp_no
+END
+
+--desactivar empleado
+CREATE PROCEDURE sp_DesactivarEmpleado
+    @emp_no INT
+AS
+BEGIN
+    UPDATE employees
+    SET is_active = 0
+    WHERE emp_no = @emp_no
+END
+
+--reactivar empleado
+CREATE PROCEDURE sp_ReactivarEmpleado
+    @emp_no INT
+AS
+BEGIN
+    UPDATE employees
+    SET is_active = 1
+    WHERE emp_no = @emp_no AND is_active = 0
+END
+
+
 -- =====================================
 -- DEPARTAMENTOS
 -- =====================================
