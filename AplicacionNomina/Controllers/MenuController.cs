@@ -9,7 +9,7 @@ namespace AplicacionNomina.Controllers
     public class MenuController : Controller
     {
         // GET: Menu
-        public ActionResult Inicio()
+        public ActionResult Index()
         {
             return View();
         }

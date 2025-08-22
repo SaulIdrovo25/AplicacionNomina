@@ -1,0 +1,84 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+
+@model List<AplicacionNomina.Models.Empleado>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<h2>Lista de Empleados Activos</h2>
+<p>
+    @Html.ActionLink("➕ Crear Nuevo Empleado", "Create", "Empleado", null, new
+    {
+        @class = "btn btn-sm me-2",
+        style = "background-color:#D5F5E3; color:#145A32; border:1px solid #a3d9c5;"
+    })
+
+    @Html.ActionLink("👥 Empleados Inactivos", "Inactivos", "Empleado", null, new
+    {
+        @class = "btn btn-sm",
+        style = "background-color:#E6E6FA; color:#4B0082; border:1px solid #d3cce3;"
+    })
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Cédula</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Correo</th>
+                <th>Género</th>
+                <th>Fecha de Contratación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var empleado in Model)
+            {
+                <tr class="table-light">
+                    <td>@empleado.Codigo</td>
+                    <td>@empleado.Cedula</td>
+                    <td>@empleado.Nombres</td>
+                    <td>@empleado.Apellidos</td>
+                    <td>@empleado.Correo</td>
+                    <td>@(empleado.Genero == "M" ? "Masculino" : "Femenino")</td>
+                    <td>@empleado.FechaContratacion.ToShortDateString()</td>
+                    <td>
+                        @Html.ActionLink("✏️ Editar", "Edit", new { id = empleado.Codigo }, new
+                        {
+                            @class = "btn btn-sm me-1",
+                            style = "background-color:#FFE5B4; color:#5A3E1B; border:1px solid #f0c68c;"
+                        })
+                        @Html.ActionLink("🔍 Detalles", "Details", new { id = empleado.Codigo }, new
+                        {
+                            @class = "btn btn-sm me-1",
+                            style = "background-color:#CDE7FF; color:#1B4F72; border:1px solid #a3cce9;"
+                        })
+                        @Html.ActionLink("🗑️ Desactivar", "Desactivar", new { id = empleado.Codigo }, new
+                        {
+                            @class = "btn btn-sm",
+                            style = "background-color:#FFD6D6; color:#7B1E1E; border:1px solid #f5a9a9;",
+                            onclick = "return confirm('¿Estás seguro de que deseas desactivar este empleado?');"
+                        })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No se encontraron empleados activos.</div>
+}
+

@@ -64,7 +64,7 @@ namespace AplicacionNomina.Controllers
                             // Puedes almacenar info de sesión aquí si quieres
                             Session["Usuario"] = model.Usuario;
 
-                            return RedirectToAction("Inicio", "Menu");
+                            return RedirectToAction("Index", "Menu");
                         }
                         else
                         {

@@ -1,0 +1,21 @@
+﻿@model AplicacionNomina.Models.Empleado
+
+<h2>Detalles del Empleado</h2>
+<table class="table table-bordered">
+    <tr><th>Código</th><td>@Model.Codigo</td></tr>
+    <tr><th>Cédula</th><td>@Model.Cedula</td></tr>
+    <tr><th>Nombres</th><td>@Model.Nombres</td></tr>
+    <tr><th>Apellidos</th><td>@Model.Apellidos</td></tr>
+    <tr><th>Género</th><td>@(Model.Genero == "M" ? "Masculino" : "Femenino")</td></tr>
+    <tr><th>Fecha de Nacimiento</th><td>@Model.FechaNacimiento.ToShortDateString()</td></tr>
+    <tr><th>Fecha de Contratación</th><td>@Model.FechaContratacion.ToShortDateString()</td></tr>
+    <tr><th>Correo</th><td>@Model.Correo</td></tr>
+    <tr><th>Activo</th><td>@(Model.Activo ? "Sí" : "No")</td></tr>
+</table>
+
+<p>
+    @Html.ActionLink("Editar", "Edit", new { id = Model.Codigo }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Volver al listado", "Index", null, new { @class = "btn btn-default" })
+</p>
+
+
