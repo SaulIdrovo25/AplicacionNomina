@@ -362,8 +362,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Archivos de configuración específicos que no necesitamos rastrear despues de todos clonar el repositorio
-AplicacionNomina/Web.config
-AplicacionNomina/AplicacionNomina.csproj
-Scripts/jquery-3.7.0-vsdoc.js
-    
