@@ -3,50 +3,47 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Consulta y descarga de reportería</h2>
-<div>
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Consulta y descarga de reportería</h2>
     <div class="row mb-3">
-        <div class="col-6 text-start">
+        <div class="col-12 col-md-6 mb-2 mb-md-0 d-flex justify-content-md-start justify-content-center">
             @using (Html.BeginForm("LeerCargos", "Reportes", FormMethod.Post))
             {
-                <button type="submit" class="btn btn-primary" id="mostrar">Nomina</button>
+                <button type="submit" class="btn btn-primary w-100 w-md-auto" id="mostrar">Nómina</button>
             }
         </div>
-
-        <div class="col-6 text-end">
+        <div class="col-12 col-md-6 d-flex justify-content-md-end justify-content-center">
             @using (Html.BeginForm("DescargarExcel", "Reportes", FormMethod.Post))
             {
-                <button type="submit" class="btn btn-success" id="descargar">Descargar Excel</button>
-            }
-        </div>
-        <div class="row">
-            @if (ViewBag.Nomina != null)
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>usuario</th>
-                            <th>salario</th>
-                            <th>fecha ingreso</th>
-                            <th>rol</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in ViewBag.Nomina)
-                        {
-                            <tr>
-                                <td>@item.usuario</td>
-                                <td>@item.salaraio</td>
-                                <td>@item.fecha</td>
-                                <td>@item.cargo</td>
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
+                <button type="submit" class="btn btn-success w-100 w-md-auto" id="descargar">Descargar Excel</button>
             }
         </div>
     </div>
-    
-</div>
 
+    @if (ViewBag.Nomina != null)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Salario</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Nomina)
+                    {
+                        <tr>
+                            <td>@item.usuario</td>
+                            <td>@item.salaraio</td>
+                            <td>@item.fecha</td>
+                            <td>@item.cargo</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

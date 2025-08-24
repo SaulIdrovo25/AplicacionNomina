@@ -1,23 +1,33 @@
 ﻿body {
     margin: 0;
     height: 100vh;
-    background: linear-gradient(270deg, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff, #d5baff, #ffbafc);
+    background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
     background-size: 1400% 1400%;
-    animation: rainbow 40s ease infinite;
+    animation: bgFriendly 16s ease-in-out infinite;
 }
 
-@keyframes rainbow {
+@keyframes bgFriendly {
     0% {
-        background-position: 0% 50%;
+        background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
     }
 
-    50% {
-        background-position: 100% 50%;
+    20% {
+        background: linear-gradient(135deg, #90caf9 0%, #42a5f5 100%);
+    }
+
+    40% {
+        background: linear-gradient(135deg, #a5d6a7 0%, #e8f5e9 100%);
+    }
+
+    60% {
+        background: linear-gradient(135deg, #fff59d 0%, #fffde7 100%);
+    }
+
+    80% {
+        background: linear-gradient(135deg, #f8bbd0 0%, #fce4ec 100%);
     }
 
     100% {
-        background-position: 0% 50%;
+        background: linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%);
     }
 }
-
-

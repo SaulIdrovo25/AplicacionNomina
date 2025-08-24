@@ -3,22 +3,26 @@
 }
 @model AplicacionNomina.Models.Empleado
 
-<h2>Detalles del Empleado</h2>
-<table class="table table-bordered">
-    <tr><th>Código</th><td>@Model.Codigo</td></tr>
-    <tr><th>Cédula</th><td>@Model.Cedula</td></tr>
-    <tr><th>Nombres</th><td>@Model.Nombres</td></tr>
-    <tr><th>Apellidos</th><td>@Model.Apellidos</td></tr>
-    <tr><th>Género</th><td>@(Model.Genero == "M" ? "Masculino" : "Femenino")</td></tr>
-    <tr><th>Fecha de Nacimiento</th><td>@Model.FechaNacimiento.ToShortDateString()</td></tr>
-    <tr><th>Fecha de Contratación</th><td>@Model.FechaContratacion.ToShortDateString()</td></tr>
-    <tr><th>Correo</th><td>@Model.Correo</td></tr>
-    <tr><th>Activo</th><td>@(Model.Activo ? "Sí" : "No")</td></tr>
-</table>
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Detalles del Empleado</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <tbody>
+                <tr><th scope="row" class="w-25">Código</th><td>@Model.Codigo</td></tr>
+                <tr><th scope="row">Cédula</th><td>@Model.Cedula</td></tr>
+                <tr><th scope="row">Nombres</th><td>@Model.Nombres</td></tr>
+                <tr><th scope="row">Apellidos</th><td>@Model.Apellidos</td></tr>
+                <tr><th scope="row">Género</th><td>@(Model.Genero == "M" ? "Masculino" : "Femenino")</td></tr>
+                <tr><th scope="row">Fecha de Nacimiento</th><td>@Model.FechaNacimiento.ToShortDateString()</td></tr>
+                <tr><th scope="row">Fecha de Contratación</th><td>@Model.FechaContratacion.ToShortDateString()</td></tr>
+                <tr><th scope="row">Correo</th><td>@Model.Correo</td></tr>
+                <tr><th scope="row">Activo</th><td>@(Model.Activo ? "Sí" : "No")</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-<p>
-    @Html.ActionLink("Editar", "Edit", new { id = Model.Codigo }, new { @class = "btn btn-primary" })
-    @Html.ActionLink("Volver al listado", "Index", null, new { @class = "btn btn-default" })
-</p>
-
-
+    <div class="d-flex gap-2 justify-content-center mt-3">
+        @Html.ActionLink("Editar", "Edit", new { id = Model.Codigo }, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Volver al listado", "Index", null, new { @class = "btn btn-secondary" })
+    </div>
+</div>
