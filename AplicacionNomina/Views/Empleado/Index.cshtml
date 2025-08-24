@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+
+@model List<AplicacionNomina.Models.Empleado>
+
+<div class="container py-4">
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success">@TempData["Mensaje"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h2 class="mb-4 text-center">Lista de Empleados Activos</h2>
+    <div class="mb-3 d-flex flex-wrap gap-2">
+        @Html.ActionLink("➕ Crear Nuevo Empleado", "Create", "Empleado", null, new { @class = "btn btn-success btn-sm" })
+        @Html.ActionLink("👥 Empleados Inactivos", "Inactivos", "Empleado", null, new { @class = "btn btn-secondary btn-sm" })
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Cédula</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Género</th>
+                        <th>Fecha de Contratación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var empleado in Model)
+                    {
+                        <tr class="table-light">
+                            <td>@empleado.Codigo</td>
+                            <td>@empleado.Cedula</td>
+                            <td>@empleado.Nombres</td>
+                            <td>@empleado.Apellidos</td>
+                            <td>@empleado.Correo</td>
+                            <td>@(empleado.Genero == "M" ? "Masculino" : "Femenino")</td>
+                            <td>@empleado.FechaContratacion.ToShortDateString()</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @Html.ActionLink("✏️ Editar", "Edit", new { id = empleado.Codigo }, new { @class = "btn btn-warning btn-sm" })
+                                    @Html.ActionLink("🔍 Detalles", "Details", new { id = empleado.Codigo }, new { @class = "btn btn-info btn-sm" })
+                                    @Html.ActionLink("🗑️ Desactivar", "Desactivar", new { id = empleado.Codigo }, new
+                                    {
+                                        @class = "btn btn-danger btn-sm",
+                                        onclick = "return confirm('¿Estás seguro de que deseas desactivar este empleado?');"
+                                    })
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">No se encontraron empleados activos.</div>
+    }
+</div>

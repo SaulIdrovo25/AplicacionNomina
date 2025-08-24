@@ -61,10 +61,10 @@ namespace AplicacionNomina.Controllers
 
                         if (autenticado == 1)
                         {
-                            // Puedes almacenar info de sesión aquí si quieres
+                            //almacenar el nombre de usuario en la sesión
                             Session["Usuario"] = model.Usuario;
 
-                            return RedirectToAction("Inicio", "Menu");
+                            return RedirectToAction("Index", "Menu");
                         }
                         else
                         {

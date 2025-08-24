@@ -1,0 +1,724 @@
+-- =====================================
+-- BASE DE DATOS ACTUALIZADA
+-- =====================================
+
+CREATE DATABASE EmpleadosReutilizacion;
+GO
+
+USE EmpleadosReutilizacion;
+GO
+
+-- =====================================
+-- TABLAS PRINCIPALES
+-- =====================================
+
+-- Tabla: Departments
+CREATE TABLE departments (
+    dept_no INT IDENTITY(1,1) PRIMARY KEY,
+    dept_name VARCHAR(50) NOT NULL,
+    is_active BIT NOT NULL DEFAULT 1
+);
+
+-- Tabla: Employees
+CREATE TABLE employees (
+    emp_no INT IDENTITY(1,1) PRIMARY KEY,
+    ci VARCHAR(50) NOT NULL UNIQUE,
+    birth_date DATE NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    gender CHAR(1) NOT NULL CHECK (gender IN ('M','F')),
+    hire_date DATE NOT NULL,
+    correo VARCHAR(100) NOT NULL UNIQUE,
+    is_active BIT NOT NULL DEFAULT 1
+);
+
+-- Tabla: Users
+CREATE TABLE users (
+    emp_no INT NOT NULL PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL UNIQUE,
+    clave_hash VARBINARY(256) NOT NULL, -- clave en HASH, no texto plano
+    rol VARCHAR(20) NOT NULL DEFAULT 'RRHH' -- admin / rrhh
+);
+
+-- Tabla: Salaries
+CREATE TABLE salaries (
+    emp_no INT NOT NULL,
+    salary DECIMAL(18,2) NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NULL,
+    PRIMARY KEY (emp_no, from_date)
+);
+
+-- Tabla: Titles
+CREATE TABLE titles (
+    emp_no INT NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NULL,
+    PRIMARY KEY (emp_no, title, from_date)
+);
+
+-- Tabla: Dept_Emp
+CREATE TABLE dept_emp (
+    emp_no INT NOT NULL,
+    dept_no INT NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    PRIMARY KEY (emp_no, dept_no),
+    CONSTRAINT CK_dept_emp_dates CHECK (from_date <= to_date)
+);
+
+-- Tabla: Dept_Manager
+CREATE TABLE dept_manager (
+    emp_no INT NOT NULL,
+    dept_no INT NOT NULL,
+    from_date DATE NOT NULL,
+    to_date DATE NOT NULL,
+    PRIMARY KEY (emp_no, dept_no),
+    CONSTRAINT CK_dept_manager_dates CHECK (from_date <= to_date)
+);
+
+-- Tabla: Log_AuditoriaSalarios
+CREATE TABLE Log_AuditoriaSalarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL,
+    fechaActualizacion DATETIME NOT NULL DEFAULT GETDATE(),
+    DetalleCambio VARCHAR(250) NOT NULL,
+    salario DECIMAL(18,2) NOT NULL,
+    emp_no INT NOT NULL
+);
+
+-- =====================================
+-- CLAVES FORÁNEAS
+-- =====================================
+
+-- users → employees
+ALTER TABLE users
+ADD CONSTRAINT FK_users_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- salaries → employees
+ALTER TABLE salaries
+ADD CONSTRAINT FK_salaries_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- titles → employees
+ALTER TABLE titles
+ADD CONSTRAINT FK_titles_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_emp → employees
+ALTER TABLE dept_emp
+ADD CONSTRAINT FK_dept_emp_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_emp → departments
+ALTER TABLE dept_emp
+ADD CONSTRAINT FK_dept_emp_departments
+FOREIGN KEY (dept_no) REFERENCES departments(dept_no);
+
+-- dept_manager → employees
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_dept_manager_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- dept_manager → departments
+ALTER TABLE dept_manager
+ADD CONSTRAINT FK_dept_manager_departments
+FOREIGN KEY (dept_no) REFERENCES departments(dept_no);
+
+-- Log_AuditoriaSalarios → employees
+ALTER TABLE Log_AuditoriaSalarios
+ADD CONSTRAINT FK_LogAuditoriaSalarios_employees
+FOREIGN KEY (emp_no) REFERENCES employees(emp_no);
+
+-- =====================================
+-- TRIGGER DE AUDITORÍA
+-- =====================================
+
+CREATE TRIGGER trg_AuditoriaSalarios
+ON salaries
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    INSERT INTO Log_AuditoriaSalarios(usuario, fechaActualizacion, DetalleCambio, salario, emp_no)
+    SELECT SYSTEM_USER, GETDATE(), 'Alta o actualización de salario', salary, emp_no
+    FROM inserted;
+END;
+GO
+
+-- =====================================
+-- PROCEDIMIENTO DE AUTENTICACIÓN
+-- (autenticación básica, comparar hash en C#)
+-- =====================================
+
+CREATE PROCEDURE AutenticarUsuario
+    @usuario VARCHAR(100),
+    @claveHash VARBINARY(256)  -- clave ya hasheada desde C#
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM users WHERE usuario = @usuario AND clave_hash = @claveHash)
+    BEGIN
+        SELECT
+            'Autenticación exitosa. Datos del empleado:' AS Mensaje,
+            u.usuario,
+            e.first_name + ' ' + e.last_name AS NombreCompleto,
+            e.correo,
+            u.rol
+        FROM users u
+        INNER JOIN employees e ON u.emp_no = e.emp_no
+        WHERE u.usuario = @usuario AND u.clave_hash = @claveHash;
+    END
+    ELSE
+    BEGIN
+        SELECT 'Usuario o clave incorrectos' AS Mensaje;
+    END
+END;
+GO
+
+
+GO
+
+
+--listar empelados activos
+CREATE PROCEDURE sp_ListarEmpleadosActivos
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE is_active = 1
+END
+
+--listar empelados inactivos
+CREATE PROCEDURE sp_ListarEmpleadosInactivos
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE is_active = 0
+END
+
+--Crear empleado (solo de la tabla empleado)
+CREATE PROCEDURE sp_CrearEmpleado
+    @ci VARCHAR(50),
+    @birth_date DATE,
+    @first_name VARCHAR(50),
+    @last_name VARCHAR(50),
+    @gender CHAR(1),
+    @hire_date DATE,
+    @correo VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO employees (ci, birth_date, first_name, last_name, gender, hire_date, correo)
+    VALUES (@ci, @birth_date, @first_name, @last_name, @gender, @hire_date, @correo)
+END
+
+--modificar empleado
+CREATE PROCEDURE sp_ModificarEmpleado
+    @id INT,
+    @ci VARCHAR(50),
+    @birth_date DATE,
+    @first_name VARCHAR(50),
+    @last_name VARCHAR(50),
+    @gender CHAR(1),
+    @hire_date DATE,
+    @correo VARCHAR(100)
+AS
+BEGIN
+    UPDATE employees
+    SET ci = @ci,
+        birth_date = @birth_date,
+        first_name = @first_name,
+        last_name = @last_name,
+        gender = @gender,
+        hire_date = @hire_date,
+        correo = @correo
+    WHERE employees.emp_no = @id
+END
+
+--obtener empleado por medio del ID (emp_no)
+CREATE PROCEDURE sp_ObtenerEmpleadoPorId
+    @emp_no INT
+AS
+BEGIN
+    SELECT emp_no, ci, birth_date, first_name, last_name, gender, hire_date, correo, is_active
+    FROM employees
+    WHERE emp_no = @emp_no
+END
+
+--desactivar empleado
+CREATE PROCEDURE sp_DesactivarEmpleado
+    @emp_no INT
+AS
+BEGIN
+    UPDATE employees
+    SET is_active = 0
+    WHERE emp_no = @emp_no
+END
+
+--reactivar empleado
+CREATE PROCEDURE sp_ReactivarEmpleado
+    @emp_no INT
+AS
+BEGIN
+    UPDATE employees
+    SET is_active = 1
+    WHERE emp_no = @emp_no AND is_active = 0
+END
+
+
+
+
+
+-- Listar departamentos activos
+CREATE PROCEDURE sp_ListarDepartamentosActivos
+AS
+BEGIN
+    SELECT dept_no, dept_name, is_active
+    FROM departments
+    WHERE is_active = 1
+END
+
+-- Listar departamentos inactivos
+CREATE PROCEDURE sp_ListarDepartamentosInactivos
+AS
+BEGIN
+    SELECT dept_no, dept_name, is_active
+    FROM departments
+    WHERE is_active = 0
+END
+
+-- Crear departamento
+CREATE PROCEDURE sp_CrearDepartamento
+    @dept_name VARCHAR(50)
+AS
+BEGIN
+    INSERT INTO departments (dept_name) VALUES (@dept_name)
+END
+
+-- Editar departamento
+CREATE PROCEDURE sp_ModificarDepartamento
+    @dept_no INT,
+    @dept_name VARCHAR(50)
+AS
+BEGIN
+    UPDATE departments
+    SET dept_name = @dept_name
+    WHERE dept_no = @dept_no
+END
+
+-- Desactivar departamento
+CREATE PROCEDURE sp_DesactivarDepartamento
+    @dept_no INT
+AS
+BEGIN
+    UPDATE departments
+    SET is_active = 0
+    WHERE dept_no = @dept_no
+END
+
+-- Reactivar departamento
+CREATE PROCEDURE sp_ReactivarDepartamento
+    @dept_no INT
+AS
+BEGIN
+    UPDATE departments
+    SET is_active = 1
+    WHERE dept_no = @dept_no AND is_active = 0
+END
+
+
+-- Listar salarios por empleado
+CREATE PROCEDURE sp_ListarSalariosPorEmpleado
+    @emp_no INT
+AS
+BEGIN
+    SELECT emp_no, salary, from_date, to_date
+    FROM salaries
+    WHERE emp_no = @emp_no
+    ORDER BY from_date DESC
+END
+
+-- Crear salario (cerrando el anterior)
+CREATE PROCEDURE sp_CrearSalario
+    @emp_no INT,
+    @salary DECIMAL(18,2),
+    @from_date DATE
+AS
+BEGIN
+    -- Cerrar el salario anterior si existe
+    UPDATE salaries
+    SET to_date = DATEADD(DAY, -1, @from_date)
+    WHERE emp_no = @emp_no AND to_date IS NULL
+
+    -- Insertar nuevo salario
+    INSERT INTO salaries (emp_no, salary, from_date, to_date)
+    VALUES (@emp_no, @salary, @from_date, NULL)
+END
+
+-- Editar salario (solo si aún está activo)
+CREATE PROCEDURE sp_ModificarSalario
+    @emp_no INT,
+    @from_date DATE,
+    @salary DECIMAL(18,2)
+AS
+BEGIN
+    UPDATE salaries
+    SET salary = @salary
+    WHERE emp_no = @emp_no AND from_date = @from_date
+END
+
+-- Finalizar vigencia de salario
+CREATE PROCEDURE sp_FinalizarSalario
+    @emp_no INT,
+    @from_date DATE,
+    @to_date DATE
+AS
+BEGIN
+    IF @to_date < @from_date
+    BEGIN
+        RAISERROR('La fecha final no puede ser anterior a la inicial.',16,1)
+        RETURN
+    END
+
+    UPDATE salaries
+    SET to_date = @to_date
+    WHERE emp_no = @emp_no AND from_date = @from_date
+END
+
+
+-- Listar asignaciones por empleado
+CREATE PROCEDURE sp_ListarAsignacionesPorEmpleado
+    @emp_no INT
+AS
+BEGIN
+    SELECT emp_no, dept_no, from_date, to_date
+    FROM dept_emp
+    WHERE emp_no = @emp_no
+    ORDER BY from_date DESC
+END
+
+-- Crear nueva asignación (cerrando anterior)
+CREATE PROCEDURE sp_CrearAsignacion
+    @emp_no INT,
+    @dept_no INT,
+    @from_date DATE
+AS
+BEGIN
+    -- Cerrar asignación anterior
+    UPDATE dept_emp
+    SET to_date = DATEADD(DAY, -1, @from_date)
+    WHERE emp_no = @emp_no AND to_date >= @from_date
+
+    -- Insertar nueva
+    INSERT INTO dept_emp (emp_no, dept_no, from_date, to_date)
+    VALUES (@emp_no, @dept_no, @from_date, '9999-12-31')
+END
+
+-- Editar asignación (solo dept_no, no las fechas iniciales)
+CREATE PROCEDURE sp_ModificarAsignacion
+    @emp_no INT,
+    @dept_no INT,
+    @from_date DATE,
+    @nuevo_dept_no INT
+AS
+BEGIN
+    UPDATE dept_emp
+    SET dept_no = @nuevo_dept_no
+    WHERE emp_no = @emp_no AND dept_no = @dept_no AND from_date = @from_date
+END
+
+-- Finalizar asignación
+CREATE PROCEDURE sp_FinalizarAsignacion
+    @emp_no INT,
+    @dept_no INT,
+    @to_date DATE
+AS
+BEGIN
+    UPDATE dept_emp
+    SET to_date = @to_date
+    WHERE emp_no = @emp_no AND dept_no = @dept_no
+END
+
+
+-- Listar gerentes por departamento
+CREATE PROCEDURE sp_ListarGerentesPorDepartamento
+    @dept_no INT
+AS
+BEGIN
+    SELECT emp_no, dept_no, from_date, to_date
+    FROM dept_manager
+    WHERE dept_no = @dept_no
+    ORDER BY from_date DESC
+END
+
+-- Asignar nuevo gerente
+CREATE PROCEDURE sp_AsignarGerente
+    @dept_no INT,
+    @emp_no INT,
+    @from_date DATE
+AS
+BEGIN
+    -- Cerrar gerente anterior
+    UPDATE dept_manager
+    SET to_date = DATEADD(DAY, -1, @from_date)
+    WHERE dept_no = @dept_no AND to_date >= @from_date
+
+    -- Insertar nuevo
+    INSERT INTO dept_manager (emp_no, dept_no, from_date, to_date)
+    VALUES (@emp_no, @dept_no, @from_date, '9999-12-31')
+END
+
+-- Editar gerente (solo cambiar emp_no)
+CREATE PROCEDURE sp_ModificarGerente
+    @dept_no INT,
+    @emp_no_actual INT,
+    @from_date DATE,
+    @nuevo_emp_no INT
+AS
+BEGIN
+    UPDATE dept_manager
+    SET emp_no = @nuevo_emp_no
+    WHERE dept_no = @dept_no AND emp_no = @emp_no_actual AND from_date = @from_date
+END
+
+-- Finalizar gerente
+CREATE PROCEDURE sp_FinalizarGerente
+    @dept_no INT,
+    @emp_no INT,
+    @to_date DATE
+AS
+BEGIN
+    UPDATE dept_manager
+    SET to_date = @to_date
+    WHERE dept_no = @dept_no AND emp_no = @emp_no
+END
+
+
+
+
+/* ================================
+   ROLES Y PERMISOS
+================================ */
+
+-- Listar todos los usuarios con su rol
+CREATE PROCEDURE sp_ListarUsuarios
+AS
+BEGIN
+    SELECT u.usuario, e.first_name + ' ' + e.last_name AS NombreEmpleado, u.rol
+    FROM users u
+    INNER JOIN employees e ON u.emp_no = e.emp_no
+END
+GO
+
+-- Cambiar rol de un usuario
+CREATE PROCEDURE sp_CambiarRolUsuario
+    @usuario VARCHAR(100),
+    @nuevoRol VARCHAR(20)
+AS
+BEGIN
+    IF @nuevoRol NOT IN ('admin','rrhh')
+    BEGIN
+        RAISERROR('Rol inválido. Debe ser admin o rrhh.',16,1)
+        RETURN
+    END
+
+    UPDATE users
+    SET rol = @nuevoRol
+    WHERE usuario = @usuario
+END
+GO
+
+
+/* ================================
+   TITLES (CRUD)
+================================ */
+
+-- Listar títulos por empleado
+CREATE PROCEDURE sp_ListarTitulosPorEmpleado
+    @emp_no INT
+AS
+BEGIN
+    SELECT emp_no, title, from_date, to_date
+    FROM titles
+    WHERE emp_no = @emp_no
+    ORDER BY from_date DESC
+END
+GO
+
+-- Crear título
+CREATE PROCEDURE sp_CrearTitulo
+    @emp_no INT,
+    @title VARCHAR(50),
+    @from_date DATE
+AS
+BEGIN
+    INSERT INTO titles (emp_no, title, from_date, to_date)
+    VALUES (@emp_no, @title, @from_date, NULL)
+END
+GO
+
+-- Modificar título (solo el nombre del título)
+CREATE PROCEDURE sp_ModificarTitulo
+    @emp_no INT,
+    @title VARCHAR(50),
+    @from_date DATE,
+    @nuevoTitulo VARCHAR(50)
+AS
+BEGIN
+    UPDATE titles
+    SET title = @nuevoTitulo
+    WHERE emp_no = @emp_no AND title = @title AND from_date = @from_date
+END
+GO
+
+-- Finalizar título
+CREATE PROCEDURE sp_FinalizarTitulo
+    @emp_no INT,
+    @title VARCHAR(50),
+    @to_date DATE
+AS
+BEGIN
+    UPDATE titles
+    SET to_date = @to_date
+    WHERE emp_no = @emp_no AND title = @title
+END
+GO
+
+
+/* ================================
+   REPORTES
+================================ */
+
+-- Reporte de nómina vigente: empleados activos con salario y departamento actual
+CREATE PROCEDURE sp_ReporteNomina
+AS
+BEGIN
+    SELECT e.emp_no, e.first_name + ' ' + e.last_name AS Empleado, d.dept_name AS Departamento,
+           s.salary AS SalarioActual, s.from_date AS FechaInicioSalario
+    FROM employees e
+    INNER JOIN salaries s ON e.emp_no = s.emp_no AND s.to_date IS NULL
+    INNER JOIN dept_emp de ON e.emp_no = de.emp_no AND de.to_date = '9999-12-31'
+    INNER JOIN departments d ON de.dept_no = d.dept_no
+    WHERE e.is_active = 1
+    ORDER BY d.dept_name, e.last_name
+END
+GO
+
+-- Reporte de cambios salariales (auditoría)
+CREATE PROCEDURE sp_ReporteCambiosSalario
+AS
+BEGIN
+    SELECT L.id, L.usuario, L.fechaActualizacion, L.DetalleCambio, L.salario, 
+           E.first_name + ' ' + E.last_name AS Empleado
+    FROM Log_AuditoriaSalarios L
+    INNER JOIN employees E ON L.emp_no = E.emp_no
+    ORDER BY L.fechaActualizacion DESC
+END
+GO
+
+-- Reporte de estructura organizacional: departamentos, gerente y empleados
+CREATE PROCEDURE sp_ReporteEstructura
+AS
+BEGIN
+    SELECT D.dept_name AS Departamento,
+           (SELECT E.first_name + ' ' + E.last_name 
+            FROM employees E
+            INNER JOIN dept_manager DM ON E.emp_no = DM.emp_no
+            WHERE DM.dept_no = D.dept_no AND DM.to_date = '9999-12-31') AS Gerente,
+           STRING_AGG(E2.first_name + ' ' + E2.last_name, ', ') AS Empleados
+    FROM departments D
+    LEFT JOIN dept_emp DE ON D.dept_no = DE.dept_no AND DE.to_date = '9999-12-31'
+    LEFT JOIN employees E2 ON DE.emp_no = E2.emp_no
+    GROUP BY D.dept_name
+END
+GO
+
+-- =====================================
+-- DEPARTAMENTOS
+-- =====================================
+
+
+INSERT INTO departments (dept_name) VALUES
+('Recursos Humanos'),
+('Finanzas'),
+('Tecnología'),
+('Marketing'),
+('Logística');
+
+-- =====================================
+-- EMPLEADOS
+-- =====================================
+
+INSERT INTO employees (ci, birth_date, first_name, last_name, gender, hire_date, correo) VALUES
+('0102345678', '1988-04-12', 'Sofía', 'Morales', 'F', '2015-02-10', 'sofia.morales@empresa.com'),
+('0203456789', '1979-09-20', 'Andrés', 'Castillo', 'M', '2010-06-15', 'andres.castillo@empresa.com'),
+('0304567890', '1992-11-08', 'Paola', 'Vásquez', 'F', '2018-09-01', 'paola.vasquez@empresa.com'),
+('0405678901', '1995-02-14', 'Jorge', 'Ríos', 'M', '2021-05-20', 'jorge.rios@empresa.com'),
+('0506789012', '1985-12-25', 'Valentina', 'Herrera', 'F', '2012-03-05', 'valentina.herrera@empresa.com');
+
+-- =====================================
+-- USUARIOS 
+-- =====================================
+
+INSERT INTO users (emp_no, usuario, clave_hash, rol) VALUES
+(1, 'smorales', 0x1234, 'rrhh'),      -- Sofía es de RRHH
+(2, 'acastillo', 0x2345, 'admin'),    -- Andrés es gerente de Finanzas
+(3, 'pvasquez', 0x3456, 'rrhh'),      -- Paola es desarrolladora
+(4, 'jrios',     0x4567, 'rrhh'),      -- Jorge es diseñador en Marketing
+(5, 'vherrera',  0x5678, 'admin');    -- Valentina es gerente de Logística
+
+-- =====================================
+-- SALARIOS
+-- =====================================
+
+INSERT INTO salaries (emp_no, salary, from_date, to_date) VALUES
+(1, 1200.00, '2015-02-10', NULL),   -- Sofía (Analista RRHH)
+(2, 3500.00, '2010-06-15', NULL),   -- Andrés (Gerente Finanzas)
+(3, 2000.00, '2018-09-01', NULL),   -- Paola (Desarrolladora TI)
+(4, 1500.00, '2021-05-20', NULL),   -- Jorge (Diseñador Marketing)
+(5, 3000.00, '2012-03-05', NULL);   -- Valentina (Gerente Logística)
+
+-- =====================================
+-- TITULOS
+-- =====================================
+
+INSERT INTO titles (emp_no, title, from_date, to_date) VALUES
+(1, 'Analista de RRHH', '2015-02-10', NULL),
+(2, 'Gerente de Finanzas', '2010-06-15', NULL),
+(3, 'Desarrolladora de Software', '2018-09-01', NULL),
+(4, 'Diseñador Gráfico', '2021-05-20', NULL),
+(5, 'Gerente de Logística', '2012-03-05', NULL);
+
+-- =====================================
+-- ASIGNACIONES A DEPARTAMENTOS
+-- =====================================
+
+INSERT INTO dept_emp (emp_no, dept_no, from_date, to_date) VALUES
+(1, 1, '2015-02-10', '9999-12-31'), -- Sofía en RRHH
+(2, 2, '2010-06-15', '9999-12-31'), -- Andrés en Finanzas
+(3, 3, '2018-09-01', '9999-12-31'), -- Paola en Tecnología
+(4, 4, '2021-05-20', '9999-12-31'), -- Jorge en Marketing
+(5, 5, '2012-03-05', '9999-12-31'); -- Valentina en Logística
+
+-- =====================================
+-- GERENTES DE DEPARTAMENTOS
+-- =====================================
+
+INSERT INTO dept_manager (emp_no, dept_no, from_date, to_date) VALUES
+(1, 1, '2020-01-01', '9999-12-31'), -- Sofía como responsable temporal de RRHH
+(2, 2, '2010-06-15', '9999-12-31'), -- Andrés gerente de Finanzas
+(3, 3, '2022-01-01', '9999-12-31'), -- Paola encargada técnica
+(4, 4, '2023-01-01', '9999-12-31'), -- Jorge coordinador de Marketing
+(5, 5, '2012-03-05', '9999-12-31'); -- Valentina gerente de Logística
+
+-- =====================================
+-- LOG DE AUDITORÍA (iniciales)
+-- =====================================
+
+INSERT INTO Log_AuditoriaSalarios (usuario, DetalleCambio, salario, emp_no) VALUES
+('admin', 'Alta salario inicial', 1200.00, 1),
+('admin', 'Alta salario inicial', 3500.00, 2),
+('rrhh',  'Alta salario inicial', 2000.00, 3),
+('rrhh',  'Alta salario inicial', 1500.00, 4),
+('admin', 'Alta salario inicial', 3000.00, 5);

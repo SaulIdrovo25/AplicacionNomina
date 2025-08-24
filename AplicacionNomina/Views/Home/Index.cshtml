@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -6,36 +6,45 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <h1 class="mb-4 text-center">Bienvenido a DataLink Empleados</h1>
-            <p class="mb-3">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h1 class="text-center mb-4">Bienvenido a DataLink Empleados</h1>
+            <div class="d-flex justify-content-center">
+                <img src="@Url.Content("~/Content/img/logoinfo.png")" alt="Bienvenida" class="img-fluid mb-3 rounded shadow" />
+            </div>
+
+            <p class="lead text-justify">
                 En un mundo donde la información es poder, DataLink Empleados surge como la plataforma que conecta a los trabajadores con sus datos personales y laborales de manera rápida, sencilla y totalmente segura. Nuestro objetivo principal es brindarte una experiencia digital confiable que te permita acceder a toda tu información cuando la necesites, sin complicaciones ni intermediarios.
             </p>
-            <p class="mb-4">
+
+            <p class="text-justify">
                 A través de nuestra página web, podrás iniciar sesión con tu usuario y contraseña para consultar de forma inmediata todos tus datos, desde tu información personal hasta tu historial salarial y cargos dentro de la empresa. Creemos en la transparencia, eficiencia y accesibilidad, por eso diseñamos un sistema que responde a las necesidades del trabajador moderno y de la empresa que busca optimizar sus procesos internos.
             </p>
-            <h2 class="mb-3">¿Por qué elegir DataLink Empleados?</h2>
+
+            <h2 class="mt-4 mb-3 text-primary text-center">¿Por qué elegir DataLink Empleados?</h2>
+
             <ul class="list-unstyled mb-4">
-                <li class="mb-2"><span class="me-2">✔</span>Seguridad total: Contamos con procesos de autenticación que protegen tu información personal.</li>
-                <li class="mb-2"><span class="me-2">✔</span>Acceso en cualquier momento: Toda tu información en un solo lugar, disponible 24/7.</li>
-                <li class="mb-2"><span class="me-2">✔</span>Transparencia garantizada: Consulta tu historial salarial y auditorías de cambios en tiempo real.</li>
-                <li class="mb-2"><span class="me-2">✔</span>Interfaz intuitiva: Fácil de usar, sin necesidad de conocimientos técnicos.</li>
+                <li class="mb-2"><span class="text-success">✔</span> Seguridad total: Contamos con procesos de autenticación que protegen tu información personal.</li>
+                <li class="mb-2"><span class="text-success">✔</span> Acceso en cualquier momento: Toda tu información en un solo lugar, disponible 24/7.</li>
+                <li class="mb-2"><span class="text-success">✔</span> Transparencia garantizada: Consulta tu historial salarial y auditorías de cambios en tiempo real.</li>
+                <li class="mb-2"><span class="text-success">✔</span> Interfaz intuitiva: Fácil de usar, sin necesidad de conocimientos técnicos.</li>
             </ul>
-            <p class="mb-4">
+
+            <p class="text-justify">
                 Nuestra misión es clara: facilitar el acceso a los datos y mejorar la comunicación entre la empresa y sus empleados, eliminando barreras y digitalizando procesos que antes eran tediosos y poco eficientes.
             </p>
-            <div class="d-flex justify-content-center">
+
+            <div class="text-center">
                 @Html.ActionLink(
-                        "Inicia sesión tocando aquí",
-                        "Autenticar",
-                        "Login",
-                        null,
-                        new
-                        {
-                            @class = "btn px-4 py-3 bg-transparent fw-bold",
-                            style = "border-radius:12px;border-width:1px;border-style:solid;box-shadow:0 4px 16px rgba(0,0,0,0.25);"
-                        }
-                    )
+                         "Inicia sesión tocando aquí",
+                         "Autenticar",
+                         "Login",
+                         null,
+                         new
+                         {
+                             @class = "btn",
+                             style = "padding:16px; border:1px solid #000; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,0.3); font-size:1.25rem; font-weight:500;"
+                         }
+                     )
             </div>
         </div>
     </div>

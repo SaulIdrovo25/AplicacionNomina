@@ -1,0 +1,80 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+@model AplicacionNomina.Models.Empleado
+
+@{
+    ViewBag.Title = "Editar Empleado";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Editar Empleado</h2>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.Codigo)
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+        <div class="row mb-3">
+            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                @Html.LabelFor(model => model.Cedula, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.Cedula, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Cedula, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-12 col-md-6">
+                @Html.LabelFor(model => model.FechaNacimiento, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.FechaNacimiento, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                @Html.ValidationMessageFor(model => model.FechaNacimiento, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                @Html.LabelFor(model => model.Nombres, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.Nombres, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Nombres, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-12 col-md-6">
+                @Html.LabelFor(model => model.Apellidos, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.Apellidos, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Apellidos, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                @Html.LabelFor(model => model.Genero, htmlAttributes: new { @class = "form-label" })
+                @Html.DropDownListFor(model => model.Genero,
+                         new SelectList(new[] {
+                        new { Value = "M", Text = "Masculino" },
+                        new { Value = "F", Text = "Femenino" }
+                         }, "Value", "Text", Model.Genero),
+                         "-- Selecciona Género --",
+                         new { @class = "form-select" })
+                @Html.ValidationMessageFor(model => model.Genero, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-12 col-md-6">
+                @Html.LabelFor(model => model.FechaContratacion, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.FechaContratacion, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                @Html.ValidationMessageFor(model => model.FechaContratacion, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12 col-md-6">
+                @Html.LabelFor(model => model.Correo, htmlAttributes: new { @class = "form-label" })
+                @Html.TextBoxFor(model => model.Correo, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Correo, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 d-flex gap-2">
+                <input type="submit" value="Guardar Cambios" class="btn btn-success flex-fill" />
+                @Html.ActionLink("Cancelar", "Index", null, new { @class = "btn btn-secondary flex-fill" })
+            </div>
+        </div>
+    }
+</div>
