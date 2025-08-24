@@ -1,0 +1,52 @@
+﻿@model IEnumerable<AplicacionNomina.Models.Reportes>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Consulta y descarga de reportería</h2>
+<div>
+    <div class="row mb-3">
+        <div class="col-6 text-start">
+            @using (Html.BeginForm("LeerCargos", "Reportes", FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-primary" id="mostrar">Nomina</button>
+            }
+        </div>
+
+        <div class="col-6 text-end">
+            @using (Html.BeginForm("DescargarExcel", "Reportes", FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-success" id="descargar">Descargar Excel</button>
+            }
+        </div>
+        <div class="row">
+            @if (ViewBag.Nomina != null)
+            {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>usuario</th>
+                            <th>salario</th>
+                            <th>fecha ingreso</th>
+                            <th>rol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ViewBag.Nomina)
+                        {
+                            <tr>
+                                <td>@item.usuario</td>
+                                <td>@item.salaraio</td>
+                                <td>@item.fecha</td>
+                                <td>@item.cargo</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+    
+</div>
+
