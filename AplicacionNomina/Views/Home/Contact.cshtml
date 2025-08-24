@@ -1,19 +1,23 @@
 ﻿@{
-    ViewBag.Title = "Contact";
+    ViewBag.Title = "Contacto";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
-
-    <address>
-        One Microsoft Way<br />
-        Redmond, WA 98052-6399<br />
-        <abbr title="Phone">P:</abbr>
-        425.555.0100
-    </address>
-
-    <address>
-        <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-        <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-    </address>
-</main>
+<div class="d-flex flex-column min-vh-100">
+    <main aria-labelledby="title" class="container flex-grow-1 d-flex align-items-center justify-content-center">
+        <div class="row justify-content-center w-100">
+            <div class="col-12 col-md-8 col-lg-6">
+                <h2 id="title" class="mb-3 text-center">@ViewBag.Title.</h2>
+                <h3 class="mb-4 text-center">@ViewBag.Message</h3>
+                <address class="mb-3 text-center">
+                    Sangolqui - Pichincha<br />
+                    Atahualpa y Victoria<br />
+                    <abbr title="Phone">Telefono:</abbr>
+                    3450038
+                </address>
+                <address class="text-center">
+                    <strong>Soporte:</strong>   <a href="mailto:Support@example.com">Support@gmail.com</a><br />
+                    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@gmail.com</a>
+                </address>
+            </div>
+        </div>
+    </main>
+</div>
