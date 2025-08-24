@@ -1,52 +1,59 @@
-﻿@model IEnumerable<AplicacionNomina.Models.Reportes>
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
 }
 
-<h2>Consulta y descarga de reportería</h2>
-<div>
-    <div class="row mb-3">
-        <div class="col-6 text-start">
-            @using (Html.BeginForm("LeerCargos", "Reportes", FormMethod.Post))
-            {
-                <button type="submit" class="btn btn-primary" id="mostrar">Nomina</button>
-            }
-        </div>
+@model List<AplicacionNomina.Models.Reportes>
 
-        <div class="col-6 text-end">
-            @using (Html.BeginForm("DescargarExcel", "Reportes", FormMethod.Post))
-            {
-                <button type="submit" class="btn btn-success" id="descargar">Descargar Excel</button>
-            }
-        </div>
-        <div class="row">
-            @if (ViewBag.Nomina != null)
-            {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>usuario</th>
-                            <th>salario</th>
-                            <th>fecha ingreso</th>
-                            <th>rol</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in ViewBag.Nomina)
-                        {
-                            <tr>
-                                <td>@item.usuario</td>
-                                <td>@item.salaraio</td>
-                                <td>@item.fecha</td>
-                                <td>@item.cargo</td>
-                            </tr>
-                        }
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">@TempData["Mensaje"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-                    </tbody>
-                </table>
+<h2>Reporte de Cargos y Usuarios</h2>
+@Html.ActionLink("📊 Descargar Excel", "DescargarExcel", "Reportes", null, new
+{
+    @class = "btn btn-sm",
+    style = "background-color:#D6EAF8; color:#154360; border:1px solid #aed6f1;"
+})
+
+<p>
+    @Html.ActionLink("🔄 Actualizar Reporte", "Index", "Reportes", null, new
+    {
+        @class = "btn btn-sm",
+        style = "background-color:#D5F5E3; color:#145A32; border:1px solid #a3d9c5;"
+    })
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Salario</th>
+                <th>Fecha de Ingreso</th>
+                <th>Rol</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reporte in Model)
+            {
+                <tr class="table-light">
+                    <td>@reporte.Usuario</td>
+                    <td>@reporte.Salario.ToString("C")</td>
+                    <td>@reporte.FechaIngreso.ToShortDateString()</td>
+                    <td>@reporte.Rol</td>
+                </tr>
             }
-        </div>
-    </div>
-    
-</div>
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No se encontraron datos de reportes.</div>
+}
 

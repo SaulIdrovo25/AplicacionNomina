@@ -1,69 +1,95 @@
 ﻿using AplicacionNomina.Models;
-using ClosedXML.Excel;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
-using System.IO;
-using System.Linq;
-using System.Web;
+using System.Data.SqlClient;
 using System.Web.Mvc;
 
 namespace AplicacionNomina.Controllers
 {
     public class ReportesController : Controller
     {
-        // GET: Reportes
-        Reportes d = new Reportes();
+        private string conexion = ConfigurationManager.ConnectionStrings["con"].ConnectionString;
+
         public ActionResult Index()
         {
-            return View();
-        }
-        public ActionResult LeerCargos() {
-            string procedimiento = "CargosUsuarios";
-            DataTable[] dtArray = d.EjecutarConsulta(procedimiento);
-            DataTable Tabladatos = dtArray[0];
-            loadTable(Tabladatos);
-            
-            return View("Index");
-        }
-        [HttpPost]
-        public ActionResult DescargarExcel()
-        {
-            DataTable[] tablas = d.EjecutarConsulta("CargosUsuarios");
-            DataTable dt = tablas[0];
-            using (var workbook = new XLWorkbook())
+            List<Reportes> lista = new List<Reportes>();
+
+            try
             {
-                var hoja = workbook.Worksheets.Add("Nomina");
-                hoja.Cell(1, 1).InsertTable(dt);
-
-                using (var ms = new MemoryStream())
+                using (SqlConnection cn = new SqlConnection(conexion))
                 {
-                    workbook.SaveAs(ms);
-                    ms.Position = 0;
+                    SqlCommand cmd = new SqlCommand("CargosUsuarios", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
 
-                    return File(ms.ToArray(),
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                "Nomina.xlsx");
+                    cn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        lista.Add(new Reportes
+                        {
+                            Usuario = reader["Usuario"].ToString(),
+                            Salario = Convert.ToDecimal(reader["Salario"]),
+                            FechaIngreso = Convert.ToDateTime(reader["Fecha_ingreso"]),
+                            Rol = reader["Rol"].ToString()
+                        });
+                    }
                 }
             }
-        }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Error al cargar reportes: " + ex.Message;
+            }
 
-        public void loadTable(DataTable _dataTable)
+            return View(lista);
+        }
+        public ActionResult DescargarExcel()
         {
             List<Reportes> lista = new List<Reportes>();
-            for (int i=0; i < _dataTable.Rows.Count; i++)
+
+            try
             {
-                Reportes r = new Reportes();
-                r.usuario = _dataTable.Rows[i]["usuario"].ToString();
-                r.cargo = _dataTable.Rows[i]["Rol"].ToString();  
-                r.salaraio = _dataTable.Rows[i]["salario"].ToString();
-                r.fecha = _dataTable.Rows[i]["fecha_ingreso"].ToString();
-                lista.Add(r);
+                using (SqlConnection cn = new SqlConnection(conexion))
+                {
+                    SqlCommand cmd = new SqlCommand("CargosUsuarios", cn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cn.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        lista.Add(new Reportes
+                        {
+                            Usuario = reader["Usuario"].ToString(),
+                            Salario = Convert.ToDecimal(reader["Salario"]),
+                            FechaIngreso = Convert.ToDateTime(reader["Fecha_ingreso"]),
+                            Rol = reader["Rol"].ToString()
+                        });
+                    }
+                }
             }
-            ViewBag.Nomina = lista;
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error al generar el archivo: " + ex.Message;
+                return RedirectToAction("Index");
+            }
+
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine("Usuario,Salario,FechaIngreso,Rol");
+
+            foreach (var item in lista)
+            {
+                sb.AppendLine($"{item.Usuario},{item.Salario},{item.FechaIngreso:yyyy-MM-dd},{item.Rol}");
+            }
+
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+            return File(buffer, "text/csv", "ReporteUsuarios.csv");
         }
 
-    }
 
     }
+}
+
