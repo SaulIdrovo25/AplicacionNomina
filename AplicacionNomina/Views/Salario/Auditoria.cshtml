@@ -1,0 +1,50 @@
+﻿@model List<AplicacionNomina.Models.AuditoriaSalario>
+
+@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+
+<h2>Auditoría de Cambios de Salario</h2>
+<p>
+    @Html.ActionLink("🔙 Volver", "Index", "Salario", null, new
+    {
+        @class = "btn btn-sm",
+        style = "background-color:#D6EAF8; color:#154360; border:1px solid #aed6f1;"
+    })
+</p>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Salario</th>
+                <th>Detalle</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr class="table-light">
+                    <td>@a.NombreCompleto (@a.EmpNo)</td>
+                    <td>@a.Salario.ToString("C")</td>
+                    <td>@a.DetalleCambio</td>
+                    <td>@a.FechaActualizacion.ToString("g")</td>
+                    <td>@a.Usuario</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No se encontraron registros de auditoría.</div>
+}

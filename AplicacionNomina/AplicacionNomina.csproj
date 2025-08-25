@@ -181,13 +181,17 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
+    <Compile Include="Controllers\SalarioController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AuditoriaSalario.cs" />
     <Compile Include="Models\Empleado.cs" />
     <Compile Include="Models\RegistroViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\Reportes.cs" />
+    <Compile Include="Models\Salario.cs" />
+    <Compile Include="Models\SalarioRegistro.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -257,6 +261,9 @@
     <Content Include="Views\Menu\Profile.cshtml" />
     <Content Include="Views\Menu\Settings.cshtml" />
     <Content Include="Views\Reportes\Index.cshtml" />
+    <Content Include="Views\Salario\Index.cshtml" />
+    <Content Include="Views\Salario\Create.cshtml" />
+    <Content Include="Views\Salario\Auditoria.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

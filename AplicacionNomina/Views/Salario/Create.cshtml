@@ -1,0 +1,50 @@
+﻿@model AplicacionNomina.Models.SalarioRegistro
+
+@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+
+<h2>Registrar Nuevo Salario</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.EmpNo)
+        @Html.DropDownListFor(
+            m => m.EmpNo,
+            ViewBag.Empleados as List<SelectListItem>,
+            "-- Selecciona un empleado --",
+            new { @class = "form-control" }
+        )
+        @Html.ValidationMessageFor(m => m.EmpNo)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Monto)
+        @Html.TextBoxFor(m => m.Monto, new { @class = "form-control", type = "number", step = "0.01" })
+        @Html.ValidationMessageFor(m => m.Monto)
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Desde)
+        @Html.TextBoxFor(m => m.Desde, new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.Desde)
+    </div>
+
+    <button type="submit" class="btn btn-sm" style="background-color:#D5F5E3; color:#145A32; border:1px solid #a3d9c5;">
+        💾 Registrar Salario
+    </button>
+    @Html.ActionLink("Cancelar", "Index", null, new
+    {
+    @class = "btn btn-sm",
+    style = "background-color:#E6E6FA; color:#4B0082; border:1px solid #d3cce3;"
+    })
+}
+

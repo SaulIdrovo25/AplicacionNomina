@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutMenu.cshtml";
+}
+
+@model List<AplicacionNomina.Models.Salario>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<h2>Historial de Salarios</h2>
+<p>
+    @Html.ActionLink("📊 Descargar Excel", "DescargarExcel", "Salario", null, new
+    {
+        @class = "btn btn-sm",
+        style = "background-color:#D6EAF8; color:#154360; border:1px solid #aed6f1;"
+    })
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Monto</th>
+                <th>Desde</th>
+                <th>Hasta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr class="table-light">
+                    <td>@s.NombreCompleto (@s.EmpNo)</td>
+                    <td>@s.Monto.ToString("C")</td>
+                    <td>@s.Desde.ToShortDateString()</td>
+                    <td>@(s.Hasta.HasValue ? s.Hasta.Value.ToShortDateString() : "Actual")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">No se encontraron registros de salarios.</div>
+}
+<p>
+    @Html.ActionLink("➕ Registrar Nuevo Salario", "Create", "Salario", null, new
+    {
+        @class = "btn btn-sm",
+        style = "background-color:#D5F5E3; color:#145A32; border:1px solid #a3d9c5;"
+    })
+    @Html.ActionLink("🕵️ Ver Auditoría", "Auditoria", "Salario", null, new
+    {
+    @class = "btn btn-sm",
+    style = "background-color:#F9EBEA; color:#943126; border:1px solid #f5c6cb;"
+    })
+</p>
+
+
+
+
+
