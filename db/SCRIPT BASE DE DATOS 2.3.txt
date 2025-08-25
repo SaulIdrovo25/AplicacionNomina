@@ -634,6 +634,77 @@ BEGIN
 END
 GO
 
+
+
+--Historial de salarios
+CREATE PROCEDURE sp_HistorialSalarios
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        s.emp_no,
+        e.first_name + ' ' + e.last_name AS NombreCompleto,
+        s.salary AS Monto,
+        s.from_date AS Desde,
+        s.to_date AS Hasta
+    FROM salaries s
+    INNER JOIN employees e ON s.emp_no = e.emp_no
+    ORDER BY s.emp_no, s.from_date DESC;
+END
+GO
+
+--Ingresar un nuevo Salario
+CREATE PROCEDURE sp_InsertarSalario
+    @emp_no INT,
+    @salary DECIMAL(18,2),
+    @from_date DATE,
+    @usuario VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cerrar salario anterior si existe
+    UPDATE salaries
+    SET to_date = @from_date
+    WHERE emp_no = @emp_no AND to_date IS NULL;
+
+    -- Insertar nuevo salario
+    INSERT INTO salaries (emp_no, salary, from_date, to_date)
+    VALUES (@emp_no, @salary, @from_date, NULL);
+
+    -- Registrar en auditoría
+    INSERT INTO Log_AuditoriaSalarios (usuario, DetalleCambio, salario, emp_no)
+    VALUES (
+        @usuario,
+        CONCAT('Nuevo salario registrado: ', @salary, ' desde ', FORMAT(@from_date, 'yyyy-MM-dd')),
+        @salary,
+        @emp_no
+    );
+END
+GO
+
+
+--Auditoria Salario
+CREATE PROCEDURE sp_HistorialAuditoriaSalarios
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        a.id,
+        a.usuario,
+        a.fechaActualizacion,
+        a.DetalleCambio,
+        a.salario,
+        a.emp_no,
+        e.first_name + ' ' + e.last_name AS NombreCompleto
+    FROM Log_AuditoriaSalarios a
+    INNER JOIN employees e ON a.emp_no = e.emp_no
+    ORDER BY a.fechaActualizacion DESC;
+END
+GO
+
 -- =====================================
 -- DEPARTAMENTOS
 -- =====================================
@@ -721,4 +792,5 @@ INSERT INTO Log_AuditoriaSalarios (usuario, DetalleCambio, salario, emp_no) VALU
 ('admin', 'Alta salario inicial', 3500.00, 2),
 ('rrhh',  'Alta salario inicial', 2000.00, 3),
 ('rrhh',  'Alta salario inicial', 1500.00, 4),
+
 ('admin', 'Alta salario inicial', 3000.00, 5);
